@@ -2,6 +2,7 @@ package com.taotao.common.utils;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -94,6 +95,7 @@ public class TaotaoResult {
             if (clazz == null) {
                 return MAPPER.readValue(jsonData, TaotaoResult.class);
             }
+            MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             JsonNode jsonNode = MAPPER.readTree(jsonData);
             JsonNode data = jsonNode.get("data");
             Object obj = null;
@@ -102,10 +104,11 @@ public class TaotaoResult {
                     obj = MAPPER.readValue(data.traverse(), clazz);
                 } else if (data.isTextual()) {
                     obj = MAPPER.readValue(data.asText(), clazz);
-                }
+                } 
             }
             return build(jsonNode.get("status").intValue(), jsonNode.get("msg").asText(), obj);
         } catch (Exception e) {
+        	e.printStackTrace();
             return null;
         }
     }
